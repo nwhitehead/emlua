@@ -9,7 +9,8 @@ project(EMLua)
 set (CMAKE_CXX_STANDARD 14)
 
 # Use emscripten
-#set (CMAKE_C_COMPILER emcc)
+set (CMAKE_C_COMPILER emcc)
+set (CMAKE_CXX_COMPILER em++)
 
 ### EXTERNAL PROJECTS
 
@@ -66,5 +67,5 @@ add_library(lua ${LUA_SRCS})
 set(SRCS
     src/main.cpp
 )
-add_executable(main ${SRCS})
-target_link_libraries(main lua)
+add_executable(main.js ${SRCS})
+target_link_libraries(main.js lua)

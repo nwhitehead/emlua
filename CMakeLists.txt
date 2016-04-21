@@ -21,31 +21,45 @@ set(EXTERNAL ${PROJECT_SOURCE_DIR}/external)
 include_directories(${EXTERNAL}/Selene/include)
 
 ## Lua
-# Add using ZIP file as ExternalProject to keep things clean
-include(ExternalProject)
-set(ljpre ${PROJECT_BINARY_DIR}/Lua)
-set(ljsrc ${ljpre}/src/lua-build/src)
 
-ExternalProject_Add(lua-build
-	URL ${EXTERNAL}/lua-5.3.2.tar.gz
-	PREFIX ${ljpre}
-	CONFIGURE_COMMAND ""
-	BUILD_IN_SOURCE 1
-	# Quotation pattern is important here
-#	BUILD_COMMAND make generic "SYSCFLAGS=-DLUA_USE_POSIX -DLUA_USE_DLOPEN" "SYSLIBS=-lm -ldl"
-	BUILD_COMMAND make generic "SYSCFLAGS=-DLUA_USE_POSIX"
-	INSTALL_COMMAND ""
-	COMMAND ${CMAKE_COMMAND} -E copy ${ljsrc}/lua ${ljpre}
-	COMMAND ${CMAKE_COMMAND} -E copy ${ljsrc}/liblua.a ${ljpre}
+set (lua_prefix "${EXTERNAL}/lua-5.3.2/src")
+include_directories(${lua_prefix})
+set (LUA_SRCS
+    ${lua_prefix}/lapi.c
+    ${lua_prefix}/lauxlib.c
+    ${lua_prefix}/lbaselib.c
+    ${lua_prefix}/lbitlib.c
+    ${lua_prefix}/lcode.c
+    ${lua_prefix}/lcorolib.c
+    ${lua_prefix}/lctype.c
+    ${lua_prefix}/ldblib.c
+    ${lua_prefix}/ldebug.c
+    ${lua_prefix}/ldo.c
+    ${lua_prefix}/ldump.c
+    ${lua_prefix}/lfunc.c
+    ${lua_prefix}/lgc.c
+    ${lua_prefix}/linit.c
+    ${lua_prefix}/liolib.c
+    ${lua_prefix}/llex.c
+    ${lua_prefix}/lmathlib.c
+    ${lua_prefix}/lmem.c
+    ${lua_prefix}/loadlib.c
+    ${lua_prefix}/lobject.c
+    ${lua_prefix}/lopcodes.c
+    ${lua_prefix}/loslib.c
+    ${lua_prefix}/lparser.c
+    ${lua_prefix}/lstate.c
+    ${lua_prefix}/lstring.c
+    ${lua_prefix}/lstrlib.c
+    ${lua_prefix}/ltable.c
+    ${lua_prefix}/ltablib.c
+    ${lua_prefix}/lundump.c
+    ${lua_prefix}/lutf8lib.c
+    ${lua_prefix}/ltm.c
+    ${lua_prefix}/lvm.c
+    ${lua_prefix}/lzio.c
 )
-set (ljname liblua.a)
-add_library(lua STATIC IMPORTED)
-set_property(TARGET lua PROPERTY IMPORTED_LOCATION ${ljpre}/liblua.a)
-add_dependencies(lua lua-build)
-ExternalProject_Get_Property(lua-build source_dir)
-set(LUA_INCLUDE_DIR ${source_dir}/src)
-set(LUA_BINARY ${ljpre}/lua)
-include_directories(${LUA_INCLUDE_DIR})
+add_library(lua ${LUA_SRCS})
 
 ### MAIN
 

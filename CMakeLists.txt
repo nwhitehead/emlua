@@ -9,12 +9,16 @@ project(EMLua)
 set (CMAKE_CXX_STANDARD 14)
 
 # Use emscripten
-set (CMAKE_C_COMPILER emcc)
+#set (CMAKE_C_COMPILER emcc)
 
 ### EXTERNAL PROJECTS
 
 # External libraries location
 set(EXTERNAL ${PROJECT_SOURCE_DIR}/external)
+
+## Selene
+# Headers only
+include_directories(${EXTERNAL}/Selene/include)
 
 ## Lua
 # Add using ZIP file as ExternalProject to keep things clean
@@ -29,7 +33,7 @@ ExternalProject_Add(lua-build
 	BUILD_IN_SOURCE 1
 	# Quotation pattern is important here
 #	BUILD_COMMAND make generic "SYSCFLAGS=-DLUA_USE_POSIX -DLUA_USE_DLOPEN" "SYSLIBS=-lm -ldl"
-	BUILD_COMMAND make generic
+	BUILD_COMMAND make generic "SYSCFLAGS=-DLUA_USE_POSIX"
 	INSTALL_COMMAND ""
 	COMMAND ${CMAKE_COMMAND} -E copy ${ljsrc}/lua ${ljpre}
 	COMMAND ${CMAKE_COMMAND} -E copy ${ljsrc}/liblua.a ${ljpre}
@@ -41,7 +45,12 @@ add_dependencies(lua lua-build)
 ExternalProject_Get_Property(lua-build source_dir)
 set(LUA_INCLUDE_DIR ${source_dir}/src)
 set(LUA_BINARY ${ljpre}/lua)
+include_directories(${LUA_INCLUDE_DIR})
 
 ### MAIN
 
-add_subdirectory(src)
+set(SRCS
+    src/main.cpp
+)
+add_executable(main ${SRCS})
+target_link_libraries(main lua)

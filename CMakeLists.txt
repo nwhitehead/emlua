@@ -12,6 +12,9 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_C_COMPILER emcc)
 set (CMAKE_CXX_COMPILER em++)
 
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
+set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O2")
+
 ### EXTERNAL PROJECTS
 
 # External libraries location

@@ -67,8 +67,9 @@ add_library(lua ${LUA_SRCS})
 
 ### MAIN
 
+include_directories(src)
 set(SRCS
-    src/main.cpp
+    src/emlua.cc
 )
-add_executable(main.js ${SRCS})
-target_link_libraries(main.js lua)
+add_executable(emlua.js ${SRCS})
+target_link_libraries(emlua.js lua)

@@ -11,7 +11,6 @@ function state() {
     if (!(this instanceof state)) {
         return new state();
     }
-
     // Keep pointer to lua_State
     this._L = init();
 }

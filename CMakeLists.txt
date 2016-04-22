@@ -12,7 +12,7 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_C_COMPILER emcc)
 set (CMAKE_CXX_COMPILER em++)
 
-set (GENERIC_FLAGS "-O2 --memory-init-file 0")
+set (GENERIC_FLAGS "-O2 --memory-init-file 0 -s EXPORTED_FUNCTIONS=\"['_init', '_exec', '_deinit']\"")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 

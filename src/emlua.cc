@@ -27,6 +27,7 @@ void deinit(void) {
     }
 }
 
+/*
 int main(int argc, char *argv[]) {
 
     init();
@@ -35,3 +36,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+*/

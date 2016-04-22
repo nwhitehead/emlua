@@ -1,12 +1,10 @@
 
-#include <string>
-
-#include "selene.h"
+#include "lua.hpp"
 
 extern "C" {
 
-void init(void);
-void exec(const char *txt);
-void deinit(void);
+lua_State *init(void);
+int exec(lua_State *L, const char *txt, const char *tag);
+void deinit(lua_State *L);
 
 }

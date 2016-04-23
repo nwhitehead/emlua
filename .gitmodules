@@ -1,0 +1,3 @@
+[submodule "src/external/Selene"]
+	path = src/external/Selene
+	url = https://github.com/nwhitehead/Selene.git

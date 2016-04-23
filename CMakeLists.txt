@@ -79,8 +79,8 @@ target_link_libraries(emlua_c.js lua)
 
 add_custom_command(
     OUTPUT emlua_interface.min.js
-    DEPENDS ${PROJECT_SOURCE_DIR}/web/emlua_interface.js
-    COMMAND uglifyjs ${PROJECT_SOURCE_DIR}/web/emlua_interface.js > emlua_interface.min.js
+    DEPENDS ${PROJECT_SOURCE_DIR}/src/emlua_interface.js
+    COMMAND uglifyjs ${PROJECT_SOURCE_DIR}/src/emlua_interface.js > emlua_interface.min.js
 )
 
 add_custom_command(
@@ -88,7 +88,7 @@ add_custom_command(
     DEPENDS
         emlua_c.js
         emlua_interface.min.js
-    COMMAND cat emlua_c.js ${PROJECT_SOURCE_DIR}/web/emlua_interface.js > emlua.js
+    COMMAND cat emlua_c.js emlua_interface.min.js > emlua.js
 )
 
 add_custom_target(emlua ALL

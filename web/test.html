@@ -9,5 +9,19 @@
 
 <script src="../build/emlua.js"></script>
 <script src="emlua-interface.js"></script>
+
+<script>
+
+var l = emlua.state();
+
+l.exec('function f() g() end');
+l.exec('function g() h() end');
+l.exec('function h() error("barf") end');
+l.exec('h');
+l.exec('h()');
+l.exec('f()');
+
+</script>
+
 </body>
 </html>

@@ -2,7 +2,7 @@ var emlua =
 (function() {
 
 var init = Module.cwrap('init', 'number', null);
-var exec = Module.cwrap('exec', null, ['number', 'string', 'string']);
+var exec = Module.cwrap('exec', 'boolean', ['number', 'string', 'string']);
 var deinit = Module.cwrap('deinit', null, ['number']);
 
 /// Create a new state (optionally use new keyword)
@@ -22,17 +22,8 @@ state.prototype.exec = function(txt, tag) {
     if (!this._L) {
         throw "State has been destroyed with deinit()";
     }
-    var res = exec(this._L, txt, tag) | 0;
-    switch (res) {
-        case 0: return 'LUA_OK'; break;
-        case 1: return 'LUA_YIELD'; break;
-        case 2: return 'LUA_ERRRUN'; break;
-        case 3: return 'LUA_ERRSYNTAX'; break;
-        case 4: return 'LUA_ERRMEM'; break;
-        case 5: return 'LUA_ERRGCMM'; break;
-        case 6: return 'LUA_ERRERR'; break;
-        default: return 'LUA_UNKNOWN';
-    }
+    var res = exec(this._L, txt, tag);
+    return res;
 };
 
 /// Free up state

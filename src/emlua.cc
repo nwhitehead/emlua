@@ -22,8 +22,8 @@ sel::State *init(void) {
  * Returns string with general status (not return values)
  */
 EMSCRIPTEN_KEEPALIVE
-int exec(sel::State *L, const char *txt, const char *tag) {
-    return (*L)(txt, tag);
+int exec(sel::State *L, const char *txt, const char *tag, int show_traceback) {
+    return (*L)(txt, tag, show_traceback);
 }
 
 /**

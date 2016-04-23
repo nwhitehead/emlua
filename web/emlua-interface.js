@@ -2,7 +2,7 @@ var emlua =
 (function() {
 
 var init = Module.cwrap('init', 'number', null);
-var exec = Module.cwrap('exec', 'boolean', ['number', 'string', 'string']);
+var exec = Module.cwrap('exec', 'boolean', ['number', 'string', 'string', 'number']);
 var deinit = Module.cwrap('deinit', null, ['number']);
 
 /// Create a new state (optionally use new keyword)
@@ -16,14 +16,15 @@ function state() {
 }
 
 /// Execute a string
-state.prototype.exec = function(txt, tag) {
+state.prototype.exec = function(txt, tag, show_traceback) {
     // Tag chunk with string if not given explicitly
     tag = tag || txt;
+    if (show_traceback === undefined) show_traceback = true;
     if (!this._L) {
         throw "State has been destroyed with deinit()";
     }
-    var res = exec(this._L, txt, tag);
-    return res;
+    var res = exec(this._L, txt, tag, show_traceback);
+    return (res === 1);
 };
 
 /// Free up state

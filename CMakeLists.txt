@@ -12,7 +12,7 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_C_COMPILER emcc)
 set (CMAKE_CXX_COMPILER em++)
 
-set (GENERIC_FLAGS "-O2 --memory-init-file 0")
+set (GENERIC_FLAGS "-O2 --memory-init-file 0 -s EXPORT_NAME=\\\"EMLUA_C\\\" -s MODULARIZE=1")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 
@@ -78,14 +78,19 @@ target_link_libraries(emlua_c.js lua)
 ### Package
 
 add_custom_command(
-    OUTPUT ${PROJECT_BINARY_DIR}/emlua.js
-    DEPENDS
-        emlua_c.js
-        ${PROJECT_SOURCE_DIR}/web/emlua_interface.js
-        ${PROJECT_SOURCE_DIR}/package.json
-    COMMAND browserify ${PROJECT_SOURCE_DIR} > ${PROJECT_BINARY_DIR}/dist.js
+    OUTPUT emlua_interface.min.js
+    DEPENDS ${PROJECT_SOURCE_DIR}/web/emlua_interface.js
+    COMMAND uglifyjs ${PROJECT_SOURCE_DIR}/web/emlua_interface.js > emlua_interface.min.js
 )
 
-#~ add_custom_target(dist ALL
-    #~ DEPENDS ${PROJECT_BINARY_DIR}/dist.js
-#~ )
+add_custom_command(
+    OUTPUT emlua.js
+    DEPENDS
+        emlua_c.js
+        emlua_interface.min.js
+    COMMAND cat emlua_c.js ${PROJECT_SOURCE_DIR}/web/emlua_interface.js > emlua.js
+)
+
+add_custom_target(emlua ALL
+    DEPENDS emlua.js
+)

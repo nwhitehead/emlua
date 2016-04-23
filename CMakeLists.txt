@@ -19,7 +19,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 ### EXTERNAL PROJECTS
 
 # External libraries location
-set(EXTERNAL ${PROJECT_SOURCE_DIR}/external)
+set(EXTERNAL ${PROJECT_SOURCE_DIR}/src/external)
 
 ## Selene
 # Headers only
@@ -66,12 +66,10 @@ set (LUA_SRCS
 )
 add_library(lua ${LUA_SRCS})
 
-### EMLua
+### emLua
 
 include_directories(src)
-set(SRCS
-    src/emlua.cc
-)
+set(SRCS src/emlua.cc)
 add_executable(emlua_c.js ${SRCS})
 target_link_libraries(emlua_c.js lua)
 
@@ -85,12 +83,8 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT emlua.js
-    DEPENDS
-        emlua_c.js
-        emlua_interface.min.js
+    DEPENDS emlua_c.js emlua_interface.min.js
     COMMAND cat emlua_c.js emlua_interface.min.js > emlua.js
 )
 
-add_custom_target(emlua ALL
-    DEPENDS emlua.js
-)
+add_custom_target(emlua ALL DEPENDS emlua.js)

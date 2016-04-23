@@ -2,11 +2,9 @@
   "name": "emlua",
   "version": "1.0.0",
   "description": "Lua interpreter for Node and the web.",
-  "main": "index.js",
+  "main": "emlua.js",
   "dependencies": {},
-  "devDependencies": {
-    "webpack": "^1.13.0"
-  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

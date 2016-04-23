@@ -1,27 +1,49 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<meta charset="utf-8">
 <title>EmLua Test</title>
+<style>body { background: #000; color: #aaa; }</style>
+<link rel="stylesheet" href="main.css">
 </head>
 <body>
 
-<h1>This is an EmLua test</h1>
+<div class="workspace">
+    <div class="header">
+        <div class="padding">
+            <a href="#" class="button" id="run">Run</a>
+            <a href="#" class="button button-primary" id="save">Save</a>
+        </div>
+    </div>
+    <div class="left-pane">
+        <div id="editor" class="editor"></div>
+    </div>
+    <div id="resizer" class="resizer"></div>
+    <div class="right-pane">
+        <div class="top-right-area">
+            <canvas id="output" class="output" width=320 height=240></canvas>
+        </div>
+        <div class="bottom-right-area">
+            <div id="terminal-container" class="terminal-container">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <div class="padding">
+        Lua in the browser.
+    </div>
+</div>
 
+<script src="../vendor/ace/ace-src-min-noconflict.js"></script>
+<script src="../vendor/ace/mode-lua.js"></script>
+<script src="../vendor/ace/theme-twilight.js"></script>
 <script src="../build/emlua.js"></script>
 <script src="emlua-interface.js"></script>
 
-<script>
-
-var l = emlua.state();
-
-l.exec('function f() g() end');
-l.exec('function g() h() end');
-l.exec('function h() error("barf") end');
-l.exec('h');
-l.exec('h()');
-l.exec('f()');
-
-</script>
+<!--
+<script src="../build/dist.js"></script>
+-->
 
 </body>
 </html>

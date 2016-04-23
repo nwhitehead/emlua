@@ -66,7 +66,7 @@ set (LUA_SRCS
 )
 add_library(lua ${LUA_SRCS})
 
-### MAIN
+### EMLua
 
 include_directories(src)
 set(SRCS
@@ -74,3 +74,18 @@ set(SRCS
 )
 add_executable(emlua.js ${SRCS})
 target_link_libraries(emlua.js lua)
+
+### Browserify
+
+add_custom_command(
+    OUTPUT ${PROJECT_BINARY_DIR}/dist.js
+    DEPENDS
+        emlua.js
+        ${PROJECT_SOURCE_DIR}/web/main.js
+        ${PROJECT_SOURCE_DIR}/package.json
+    COMMAND browserify ${PROJECT_SOURCE_DIR} > ${PROJECT_BINARY_DIR}/dist.js
+)
+
+add_custom_target(dist ALL
+    DEPENDS ${PROJECT_BINARY_DIR}/dist.js
+)

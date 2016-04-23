@@ -1,12 +1,12 @@
-var emlua = 
-(function() {
+
+var Module = require('../build/emlua.js')();
 
 var init = Module.cwrap('init', 'number', null);
 var exec = Module.cwrap('exec', 'boolean', ['number', 'string', 'string', 'number']);
 var deinit = Module.cwrap('deinit', null, ['number']);
 
 /// Create a new state (optionally use new keyword)
-function state() {
+var state = function() {
     // Check if called without new
     if (!(this instanceof state)) {
         return new state();
@@ -46,8 +46,5 @@ state.prototype.reset = function() {
     this._L = init();
 };
 
-return {
-    state: state
-};
-
-})();
+/// Just export constructor
+module.exports = state;

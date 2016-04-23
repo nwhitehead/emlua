@@ -1,0 +1,14 @@
+{
+  "main": "./web/main.js",
+  "browser": "./web/main.js",
+  "browserify-shim": {
+    "emlua": "Module"
+  },
+  "browserify": {
+    "transform": [ "browserify-shim" ]
+  },
+  "dependencies": {
+    "browserify": "~3.46.0",
+    "browserify-shim": "~3.2.0"
+  }
+}

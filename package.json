@@ -1,14 +1,15 @@
 {
-  "main": "./web/main.js",
-  "browser": "./web/main.js",
-  "browserify-shim": {
-    "emlua": "Module"
+  "name": "emlua",
+  "version": "1.0.0",
+  "description": "Lua interpreter for Node and the web.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^1.13.0"
   },
-  "browserify": {
-    "transform": [ "browserify-shim" ]
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "browserify": "~3.46.0",
-    "browserify-shim": "~3.2.0"
-  }
+  "author": "Nathan Whitehead",
+  "license": "ISC"
 }

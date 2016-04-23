@@ -72,20 +72,20 @@ include_directories(src)
 set(SRCS
     src/emlua.cc
 )
-add_executable(emlua.js ${SRCS})
-target_link_libraries(emlua.js lua)
+add_executable(emlua_c.js ${SRCS})
+target_link_libraries(emlua_c.js lua)
 
-### Browserify
+### Package
 
 add_custom_command(
-    OUTPUT ${PROJECT_BINARY_DIR}/dist.js
+    OUTPUT ${PROJECT_BINARY_DIR}/emlua.js
     DEPENDS
-        emlua.js
-        ${PROJECT_SOURCE_DIR}/web/main.js
+        emlua_c.js
+        ${PROJECT_SOURCE_DIR}/web/emlua_interface.js
         ${PROJECT_SOURCE_DIR}/package.json
     COMMAND browserify ${PROJECT_SOURCE_DIR} > ${PROJECT_BINARY_DIR}/dist.js
 )
 
-add_custom_target(dist ALL
-    DEPENDS ${PROJECT_BINARY_DIR}/dist.js
-)
+#~ add_custom_target(dist ALL
+    #~ DEPENDS ${PROJECT_BINARY_DIR}/dist.js
+#~ )

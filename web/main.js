@@ -1,5 +1,5 @@
 
-var emlua = require('../web/emlua-interface.js');
+var emlua = require('../web/emlua.js');
 
 var l = emlua();
 

@@ -1,4 +1,6 @@
 
+// Emscripten module is always named EMLUA_C in global namespace.
+// Had trouble using require on it.
 var emlua_c = EMLUA_C({});
 
 var init = emlua_c.cwrap('init', 'number', null);

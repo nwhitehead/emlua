@@ -1,3 +1,5 @@
+/// General imports
+var moment = require('moment');
 
 /// ACE editor with styles and syntax highlighting
 var ace = require('ace');
@@ -24,8 +26,6 @@ var lua = emlua({
         terminal.write(ansi_normal + ansi_yellow + ansi_bold + txt + '\n');
     }
 });
-
-console.log(lua._emlua_c.print);
 
 // Show banner
 var ansi_normal = "\x1b[0m";
@@ -54,6 +54,9 @@ editor.setValue(txt_default);
 // Hook up RUN button
 var run = function() {
     var txt = editor.getValue();
+    lua.reset();
+    var t = moment().format('MMMM Do YYYY, h:mm:ss a');
+    terminal.write(ansi_purple + '\nRunning code ' + ansi_normal + '(' + t + ')' + '\n\n')
     lua.exec(txt, 'editor');
 };
 
@@ -71,13 +74,3 @@ editor.commands.addCommand({
 
 // Set default focus to editor
 editor.focus();
-
-
-
-
-//~ l.exec('function f() g() end');
-//~ l.exec('function g() h() end');
-//~ l.exec('function h() error("barf") end');
-//~ l.exec('h');
-//~ l.exec('h()');
-//~ l.exec('f()');

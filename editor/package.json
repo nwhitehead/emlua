@@ -5,10 +5,25 @@
   "main": "src/main.js",
   "dependencies": {},
   "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-browserify": "^5.0.0"
+    "browserify": "^13.0.0",
+    "browserify-css": "^0.9.1",
+    "browserify-shim": "^3.8.12"
+  },
+  "browser": {
+    "main": "src/main.js",
+    "ace": "./vendor/ace/ace-src-min-noconflict.js"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim",
+      "browserify-css"
+    ]
+  },
+  "browserify-shim": {
+    "ace": "ace"
   },
   "scripts": {
+    "build-js": "browserify . > ../build/dist.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Nathan Whitehead",

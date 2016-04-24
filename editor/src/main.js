@@ -16,7 +16,16 @@ var terminal = Console.create('terminal-container');
 ////////////////////////////////
 
 // Start Lua interpreter
-var lua = emlua();
+var lua = emlua({
+    'print': function(txt) {
+        terminal.write(ansi_normal + txt + '\n');
+    },
+    'printErr': function(txt) {
+        terminal.write(ansi_normal + ansi_yellow + ansi_bold + txt + '\n');
+    }
+});
+
+console.log(lua._emlua_c.print);
 
 // Show banner
 var ansi_normal = "\x1b[0m";
@@ -50,14 +59,18 @@ var run = function() {
 
 document.getElementById('run').onclick = run;
 
-lua.module.print = function(txt) {
-    terminal.write(ansi_normal + txt + '\n');
-};
+// Add keyboard shortcut for run
+editor.commands.addCommand({
+    name: 'run',
+    bindKey: {win: 'Ctrl-Enter', mac: 'Command-Enter'},
+    exec: function(editor) {
+        run();
+    },
+    readOnly: true
+});
 
-lua.module.printErr = function(txt) {
-    terminal.write(ansi_normal + ansi_yellow + ansi_bold + txt + '\n');
-};
-
+// Set default focus to editor
+editor.focus();
 
 
 

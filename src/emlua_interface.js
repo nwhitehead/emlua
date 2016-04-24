@@ -52,7 +52,7 @@ state.prototype.deinit = function() {
 var main = function(options) {
     // Check if called without new
     if (!(this instanceof main)) {
-        return new main();
+        return new main(options);
     }
     // Keep track of options
     var emlua_c = EMLUA_C(options);

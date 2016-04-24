@@ -1,0 +1,16 @@
+{
+  "name": "emlua-editor",
+  "version": "1.0.0",
+  "description": "Editor to play around with Lua code and run it.",
+  "main": "src/main.js",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-browserify": "^5.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nathan Whitehead",
+  "license": "ISC"
+}

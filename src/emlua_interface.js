@@ -17,6 +17,9 @@ var state = function() {
     this._L = init();
 }
 
+/// Get reference to C space
+state.prototype.module = emlua_c;
+
 /// Execute a string
 state.prototype.exec = function(txt, tag, show_traceback) {
     // Tag chunk with string if not given explicitly

@@ -15,6 +15,9 @@ var terminal = Console.create('terminal-container');
 
 ////////////////////////////////
 
+// Start Lua interpreter
+var lua = emlua();
+
 // Show banner
 var ansi_normal = "\x1b[0m";
 var ansi_purple = "\x1b[35m";
@@ -39,17 +42,29 @@ editor.$blockScrolling = Infinity;
 var txt_default = "\n-- Put your Lua code here\n\n";
 editor.setValue(txt_default);
 
+// Hook up RUN button
+var run = function() {
+    var txt = editor.getValue();
+    lua.exec(txt, 'editor');
+};
+
+document.getElementById('run').onclick = run;
+
+lua.module.print = function(txt) {
+    terminal.write(ansi_normal + txt + '\n');
+};
+
+lua.module.printErr = function(txt) {
+    terminal.write(ansi_normal + ansi_yellow + ansi_bold + txt + '\n');
+};
 
 
 
 
 
-
-var l = emlua();
-
-l.exec('function f() g() end');
-l.exec('function g() h() end');
-l.exec('function h() error("barf") end');
-l.exec('h');
-l.exec('h()');
-l.exec('f()');
+//~ l.exec('function f() g() end');
+//~ l.exec('function g() h() end');
+//~ l.exec('function h() error("barf") end');
+//~ l.exec('h');
+//~ l.exec('h()');
+//~ l.exec('f()');

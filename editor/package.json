@@ -24,6 +24,7 @@
   },
   "scripts": {
     "build-js": "browserify . > ../build/dist.js",
+    "watch-js": "watchify . -o ../build/dist.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Nathan Whitehead",

@@ -46,7 +46,6 @@ Console.create = function(container, options) {
 
     term.on('key', function (key, ev) {
         if (!term.active) return;
-        console.log("KEY ", ev);
         var is_arrow = (ev.code === 'ArrowLeft') || (ev.code === 'ArrowRight') || (ev.code === 'ArrowUp') || (ev.code === 'ArrowDown');
         var printable = (!ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey && !is_arrow);
 

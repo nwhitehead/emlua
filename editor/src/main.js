@@ -26,6 +26,7 @@ var lua = emlua({
 });
 
 // Show banner
+var ansi_clear = "\x1b[2J\x1b[1;1f";
 var ansi_normal = "\x1b[0m";
 var ansi_purple = "\x1b[35m";
 var ansi_bold = "\x1b[1m";
@@ -38,9 +39,8 @@ var responder = function(txt) {
     // If console input starts with "=", replace with "return ..."
     // This lets the user examine variables more easily
     if (txt.substring(0, 1) === '=') {
-        txt = 'return ' + txt.substring(1);
+        txt = 'print(' + txt.substring(1) + ')';
     }
-    console.log('EVAL ' + txt);
     lua.exec(txt, 'console');
     return true;
 };
@@ -79,6 +79,13 @@ editor.commands.addCommand({
     },
     readOnly: true
 });
+
+// Hook up CLEAR button
+var clear = function() {
+    terminal.write(ansi_clear);
+};
+
+document.getElementById('clear').onclick = clear;
 
 // Set default focus to editor
 editor.focus();

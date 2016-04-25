@@ -13,8 +13,6 @@ require('../vendor/xterm.js/xterm.css');
 /// Main
 require('./main.css');
 var emlua = EMLUA;
-var terminal = Console.create('terminal-container');
-
 ////////////////////////////////
 
 // Start Lua interpreter
@@ -36,8 +34,17 @@ var msg =
     ansi_purple + ansi_bold + "ManiacWebSDK Output Console\n" + ansi_normal +
     ansi_purple + "~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" + ansi_normal +
     ansi_purple + "Copyright 2016 Nathan Whitehead and others\n\n" + ansi_normal;
-
-terminal.write(msg);
+var responder = function(txt) {
+    // If console input starts with "=", replace with "return ..."
+    // This lets the user examine variables more easily
+    if (txt.substring(0, 1) === '=') {
+        txt = 'return ' + txt.substring(1);
+    }
+    console.log('EVAL ' + txt);
+    lua.exec(txt, 'console');
+    return true;
+};
+var terminal = Console.create('terminal-container', { active: true, banner: msg, responder: responder });
 
 // Set up editor
 
@@ -58,6 +65,7 @@ var run = function() {
     var t = moment().format('MMMM Do YYYY, h:mm:ss a');
     terminal.write(ansi_purple + '\nRunning code ' + ansi_normal + '(' + t + ')' + '\n\n')
     lua.exec(txt, 'editor');
+    terminal.prompt();
 };
 
 document.getElementById('run').onclick = run;

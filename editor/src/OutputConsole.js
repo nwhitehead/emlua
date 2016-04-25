@@ -46,7 +46,9 @@ Console.create = function(container, options) {
 
     term.on('key', function (key, ev) {
         if (!term.active) return;
-        var printable = (!ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey);
+        console.log("KEY ", ev);
+        var is_arrow = (ev.code === 'ArrowLeft') || (ev.code === 'ArrowRight') || (ev.code === 'ArrowUp') || (ev.code === 'ArrowDown');
+        var printable = (!ev.altKey && !ev.altGraphKey && !ev.ctrlKey && !ev.metaKey && !is_arrow);
 
         if (ev.keyCode === 13) {
             term.write('\r\n');

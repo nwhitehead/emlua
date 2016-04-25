@@ -23,7 +23,7 @@ Console.create = function(container, options) {
     var term_elem = document.getElementById(container);
     var term = new Terminal();
     term.rows = 30;
-    term.scrollback = 1;
+    term.scrollback = 1000;
     term.convertEol = true;
     term.open(term_elem);
     term.fit();

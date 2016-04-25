@@ -12,7 +12,8 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_C_COMPILER emcc)
 set (CMAKE_CXX_COMPILER em++)
 
-set (GENERIC_FLAGS "-O2 --memory-init-file 0 -s EXPORT_NAME=\\\"EMLUA_C\\\" -s MODULARIZE=1")
+set (PRELOAD "${PROJECT_SOURCE_DIR}/lua_modules")
+set (GENERIC_FLAGS "-O2 --memory-init-file 0 -s EXPORT_NAME=\\\"EMLUA_C\\\" -s MODULARIZE=1 --embed-file ${PRELOAD}@/")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 

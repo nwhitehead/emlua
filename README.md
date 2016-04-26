@@ -25,11 +25,31 @@ Some advantages:
 
 ## Build
 
+Requires [Emscripten](http://kripken.github.io/emscripten-site/). Set
+up your environment variables by doing something like `source emsdk/emsdk_env.sh`.
+Once you can run `emcc --version` successfully do the following:
+
 ```
+git submodule update --init --recursive
+mkdir build
 cd build
 cmake ..
 make -j
-cd ..
-cd editor
-npm run build-js
 ```
+
+The output file is `build/emlua.js`. The build embeds all the Lua
+modules in the `lua_modules` directory.
+
+## Usage
+
+Include the single file `build/emlua.js` on your page.
+
+```
+var state = EMLUA();
+var ok = state.exec('print("The answer is " .. 42)');
+```
+
+It provides a global variable `EMLUA` that is a function. Create a new
+state by calling the function with an optional configuration object.
+The state has the `exec` method which executes Lua code passed as a
+string.

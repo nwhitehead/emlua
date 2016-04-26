@@ -40,7 +40,7 @@ make -j
 The output file is `build/emlua.js`. The build embeds all the Lua
 modules in the `lua_modules` directory.
 
-## Usage
+## Usage in Browser
 
 Include the single file `build/emlua.js` on your page.
 
@@ -53,3 +53,33 @@ It provides a global variable `EMLUA` that is a function. Create a new
 state by calling the function with an optional configuration object.
 The state has the `exec` method which executes Lua code passed as a
 string.
+
+## Usage in Node
+
+You can also use it in Node, but this is less tested. The module
+presents in a CommonJS compatible way.
+
+```
+var emlua = require('./build/emlua.js');
+var state = emlua();
+var ok = state.exec('print("The answer is " .. 42)');
+```
+
+## Integrating JavaScript and Lua
+
+### `stdout` and `stderr`
+
+You can provide custom JavaScript handlers for writes to `stdout`
+and `stderr` by defining `print` and `printErr` in the customization
+object you pass during initialization.
+
+```
+var lua = EMLUA({
+    'print': function(txt) {
+        console.log(txt);
+    },
+    'printErr': function(txt) {
+        alert(txt);
+    }
+});
+```

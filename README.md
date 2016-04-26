@@ -22,3 +22,14 @@ Some advantages:
 * Debugging Lua code fully supported, including stack traces
 * Multiple interpreter states supported in parallel
 * Surprisingly efficient (1/2 native Lua interpreter speed)
+
+## Build
+
+```
+cd build
+cmake ..
+make -j
+cd ..
+cd editor
+npm run build-js
+```

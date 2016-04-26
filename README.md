@@ -21,7 +21,7 @@ Some advantages:
 * Parsing of text and bytecode available, no preprocessing required
 * Debugging Lua code fully supported, including stack traces
 * Multiple interpreter states supported in parallel
-* Surprisingly efficient (1/2 native Lua interpreter speed)
+* Surprisingly efficient
 
 ## Build
 

@@ -4,13 +4,17 @@
 var emlua_c = EMLUA_C;
 
 /// State class, constructed from existing C state
-var state = function(parent) {
+var state = function(parent, otherL) {
     // Check if called without new
     if (!(this instanceof state)) {
         return new state(parent);
     }
     this._parent = parent;
-    this._L = parent._init();
+    if (otherL) {
+        this._L = parent._newthread(otherL);
+    } else {
+        this._L = parent._init();
+    }
     return this;
 };
 
@@ -24,6 +28,14 @@ state.prototype.exec = function(txt, tag, show_traceback) {
     }
     var res = this._parent._exec(this._L, txt, tag, show_traceback);
     return (res === 1);
+};
+
+/// Execute a string
+state.prototype.newthread = function() {
+    if (!this._L) {
+        throw "State has been destroyed with deinit()";
+    }
+    return state(this._parent, this._L);
 };
 
 /// Reset state to fresh instance
@@ -59,6 +71,7 @@ var main = function(options) {
     this._emlua_c = emlua_c;
     this._init = emlua_c.cwrap('init', 'number', null);
     this._exec = emlua_c.cwrap('exec', 'boolean', ['number', 'string', 'string', 'number']);
+    this._newthread = emlua_c.cwrap('newthread', 'number', ['number']);
     this._deinit = emlua_c.cwrap('deinit', null, ['number']);
     // Keep pointer to default state
     this._state = state(this);
@@ -77,6 +90,9 @@ main.prototype.state = function() {
 main.prototype.exec = function(txt, tag, show_traceback) {
     return this._state.exec(txt, tag, show_traceback);
 };
+main.prototype.newthread = function() {
+    return this._state.newthread();
+};
 
 /// Free up state
 main.prototype.deinit = function() {
@@ -87,6 +103,7 @@ main.prototype.deinit = function() {
     if (this._emlua_c) {
         this._init = undefined;
         this._exec = undefined;
+        this._newthread = undefined;
         this._deinit = undefined;
         this._emlua_c = undefined;
     } else {

@@ -12,8 +12,7 @@
  */
 EMSCRIPTEN_KEEPALIVE
 sel::State *init(void) {
-    sel::State *L = new sel::State{true};
-    return L;
+    return (new sel::State{true});
 }
 
 /**
@@ -24,6 +23,14 @@ sel::State *init(void) {
 EMSCRIPTEN_KEEPALIVE
 int exec(sel::State *L, const char *txt, const char *tag, int show_traceback) {
     return (*L)(txt, tag, show_traceback);
+}
+
+/**
+ * Create new coroutine thread from existing state
+ */
+EMSCRIPTEN_KEEPALIVE
+sel::State *newthread(sel::State *L) {
+    return (new sel::State{L, true});
 }
 
 /**

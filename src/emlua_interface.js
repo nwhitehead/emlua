@@ -26,8 +26,11 @@ state.prototype.exec = function(txt, tag, show_traceback) {
     if (!this._L) {
         throw "State has been destroyed with deinit()";
     }
-    var res = this._parent._exec(this._L, txt, tag, show_traceback);
-    return (res === 1);
+    var res;
+    do {
+        res = this._parent._exec(this._L, txt, tag, show_traceback);
+    } while (res === 0);
+    return res;
 };
 
 /// Execute a string

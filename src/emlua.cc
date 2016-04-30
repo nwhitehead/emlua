@@ -22,7 +22,7 @@ sel::State *init(void) {
  */
 EMSCRIPTEN_KEEPALIVE
 int exec(sel::State *L, const char *txt, const char *tag, int show_traceback) {
-    return (*L)(txt, tag, show_traceback);
+    return L->asyncly(txt, tag, show_traceback);
 }
 
 /**

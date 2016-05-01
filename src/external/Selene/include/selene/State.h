@@ -32,7 +32,7 @@ void stackdump_g(lua_State* l)
                 std::cerr << "string: '" << lua_tostring(l, i);
                 break;
             case LUA_TBOOLEAN:  /* booleans */
-                std::cerr << "boolean: " << lua_toboolean(l, i);
+//                std::cerr << "boolean: " << lua_toboolean(l, i);
                 break;
             case LUA_TNUMBER:  /* numbers */
                 std::cerr << "number: " << lua_tonumber(l, i);
@@ -56,6 +56,10 @@ static int traceback(lua_State *L) {
     }
     luaL_traceback(L, L, lua_tostring(L, 1), 1);
     return 1;
+}
+
+static void my_yield_hook(lua_State *L, lua_Debug *ar) {
+    lua_yield(L, 0);
 }
 
 class State {
@@ -102,6 +106,7 @@ public:
         if (should_open_libs) luaL_openlibs(_l);
         _registry.reset(new Registry(_l));
         HandleExceptionsPrintingToStdOut();
+        debug(true);
     }
     ~State() {
         if (_l != nullptr && _l_owner) {
@@ -109,6 +114,12 @@ public:
             lua_close(_l);
         }
         _l = nullptr;
+    }
+
+    void debug(bool enable) {
+        if (enable) {
+            lua_sethook(_l, &my_yield_hook, LUA_MASKCOUNT, 1000);
+        }
     }
 
     int Size() const {

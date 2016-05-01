@@ -37,6 +37,8 @@ var timeout_prefix = function(timeout) {
     return "function timeout(t) local t0 = os.time() return (function() local t1 = os.time() if t1 - t0 > t then error('timed out') end end) end debug.sethook(timeout(" + timeout + "), '', 1000)";
 };
 
+var debug_prefix = "function f() coroutine.yield() end debug.sethook(f, '', 1000)";
+
 /// Execute a string
 state.prototype.exec = function(txt, options) {
     // Tag chunk with string if not given explicitly
@@ -61,7 +63,11 @@ state.prototype.exec = function(txt, options) {
     };
     this.status = 'running';
     if (options.timeout) {
-        var res0 = new_state._parent._exec(new_state._L, timeout_prefix(options.timeout), "@timeout", false);
+//        var res0 = new_state._parent._exec(new_state._L, timeout_prefix(options.timeout), "@timeout", false);
+        // Ignore any results
+    }
+    if (options.debug) {
+//        var res0 = new_state._parent._exec(new_state._L, debug_prefix, "@debug", false);
         // Ignore any results
     }
     var res = new_state._parent._exec(new_state._L, txt, options.tag, options.show_traceback);

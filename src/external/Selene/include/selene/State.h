@@ -1,6 +1,7 @@
 #pragma once
 
 #include "emscripten.h"
+#include "emdebug.h"
 
 #include "ExceptionHandler.h"
 #include <iostream>
@@ -15,6 +16,35 @@
 #include "lua.h"
 
 namespace sel {
+
+void stackdump_g(lua_State* l)
+{
+    int i;
+    int top = lua_gettop(l);
+ 
+    std::cerr << "total in stack " << top << "\n";
+ 
+    for (i = 1; i <= top; i++)
+    {  /* repeat for each level */
+        int t = lua_type(l, i);
+        switch (t) {
+            case LUA_TSTRING:  /* strings */
+                std::cerr << "string: '" << lua_tostring(l, i);
+                break;
+            case LUA_TBOOLEAN:  /* booleans */
+                std::cerr << "boolean " << lua_toboolean(l, i) ? "true" : "false";
+                break;
+            case LUA_TNUMBER:  /* numbers */
+                std::cerr << "number: " << lua_tonumber(l, i);
+                break;
+            default:  /* other values */
+                std::cerr << lua_typename(l, t);
+                break;
+        }
+        std::cerr << "    ";
+    }
+    std::cerr << std::endl;
+}
 
 static int traceback(lua_State *L) {
     if (!lua_isstring(L, 1)) {
@@ -164,19 +194,29 @@ public:
         _exception_handler->Handle_top_of_stack(status, _l);
         return false;
     }
-    int asyncly(const char *code, const char *tag, bool show_traceback) {
+    void status() {
+        stackdump_g(_l);
+    }
+    void clear() {
+        lua_settop(_l, 0);
+    }
+    int resume(const char *code, const char *tag, bool show_traceback) {
         ResetStackOnScopeExit savedStack(_l);
-        if (show_traceback) {
-            lua_pushcfunction(_l, traceback);
-        }
-        int status = luaL_loadbuffer(_l, code, std::strlen(code), tag);
-        if (status != LUA_OK) {
-            _exception_handler->Handle_top_of_stack(status, _l);
-            return false;
+        int status;
+        if (std::string(code).length() > 0) {
+            status = luaL_loadbuffer(_l, code, std::strlen(code), tag);
+            if (status != LUA_OK) {
+                _exception_handler->Handle_top_of_stack(status, _l);
+                return false;
+            }
         }
         status = lua_resume(_l, nullptr, 0);
         if (status == LUA_OK || status == LUA_YIELD) {
             return status;
+        }
+        if (show_traceback) {
+            // We can do traceback now, stack is not disturbed by returning from dead coroutine
+            traceback(_l);
         }
         _exception_handler->Handle_top_of_stack(status, _l);
         return status;

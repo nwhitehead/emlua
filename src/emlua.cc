@@ -22,7 +22,7 @@ sel::State *init(void) {
  */
 EMSCRIPTEN_KEEPALIVE
 int exec(sel::State *L, const char *txt, const char *tag, int show_traceback) {
-    return L->asyncly(txt, tag, show_traceback);
+    return L->resume(txt, tag, show_traceback);
 }
 
 /**
@@ -31,6 +31,22 @@ int exec(sel::State *L, const char *txt, const char *tag, int show_traceback) {
 EMSCRIPTEN_KEEPALIVE
 sel::State *newthread(sel::State *L) {
     return (new sel::State{L, true});
+}
+
+/**
+ * Show status
+ */
+EMSCRIPTEN_KEEPALIVE
+void status(sel::State *L) {
+    L->status();
+}
+
+/**
+ * Clear stack (let any subthreads be gc-ed)
+ */
+EMSCRIPTEN_KEEPALIVE
+void clear(sel::State *L) {
+    L->clear();
 }
 
 /**

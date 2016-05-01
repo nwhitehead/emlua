@@ -33,6 +33,10 @@ var post_blocking_task = function(f) {
     window.setTimeout(f);
 };
 
+var timeout_prefix = function(timeout) {
+    return "function timeout(t) local t0 = os.time() return (function() local t1 = os.time() if t1 - t0 > t then error('timed out') end end) end debug.sethook(timeout(" + timeout + "), '', 1000)";
+};
+
 /// Execute a string
 state.prototype.exec = function(txt, options) {
     // Tag chunk with string if not given explicitly
@@ -46,7 +50,6 @@ state.prototype.exec = function(txt, options) {
     var that = this;
     var resume = function() {
         var res = new_state._parent._exec(new_state._L, "", options.tag, options.show_traceback);
-//        console.log('res(1) = ' + res);
         if (res === LUA_YIELD) {
             post_blocking_task(resume);
             return;
@@ -57,9 +60,11 @@ state.prototype.exec = function(txt, options) {
         }
     };
     this.status = 'running';
-//    console.log('Calling _exec (1)', new_state._parent, new_state._L);
+    if (options.timeout) {
+        var res0 = new_state._parent._exec(new_state._L, timeout_prefix(options.timeout), "@timeout", false);
+        // Ignore any results
+    }
     var res = new_state._parent._exec(new_state._L, txt, options.tag, options.show_traceback);
-//    console.log('res(2) = ' + res);
     if (res === LUA_YIELD) {
         post_blocking_task(resume);
         return;

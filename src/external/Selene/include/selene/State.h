@@ -32,7 +32,7 @@ void stackdump_g(lua_State* l)
                 std::cerr << "string: '" << lua_tostring(l, i);
                 break;
             case LUA_TBOOLEAN:  /* booleans */
-                std::cerr << "boolean " << lua_toboolean(l, i) ? "true" : "false";
+                std::cerr << "boolean: " << lua_toboolean(l, i);
                 break;
             case LUA_TNUMBER:  /* numbers */
                 std::cerr << "number: " << lua_tonumber(l, i);

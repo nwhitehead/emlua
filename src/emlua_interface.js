@@ -3,6 +3,14 @@
 // Had trouble using require on it.
 var emlua_c = EMLUA_C;
 
+var LUA_OK = 0;
+var LUA_YIELD = 1;
+var LUA_ERRRUN = 2;
+var LUA_ERRSYNTAX = 3;
+var LUA_ERRMEM = 4;
+var LUA_ERRGCMM = 5;
+var LUA_ERRERR = 6;
+
 /// State class, constructed from existing C state
 var state = function(parent, otherL) {
     // Check if called without new
@@ -15,22 +23,46 @@ var state = function(parent, otherL) {
     } else {
         this._L = parent._init();
     }
+    this.status = 'ready';
     return this;
 };
 
+/// Post a blocking task to the browser main loop
+var post_blocking_task = function(f) {
+    window.setTimeout(f);
+};
+
 /// Execute a string
-state.prototype.exec = function(txt, tag, show_traceback) {
+state.prototype.exec = function(txt, options) {
     // Tag chunk with string if not given explicitly
-    tag = tag || txt;
-    if (show_traceback === undefined) show_traceback = true;
+    options = options || {};
+    options.tag = options.tag || txt;
+    if (options.show_traceback === undefined) options.show_traceback = true;
     if (!this._L) {
         throw "State has been destroyed with deinit()";
     }
-    var res;
-    do {
-        res = this._parent._exec(this._L, txt, tag, show_traceback);
-    } while (res === 0);
-    return res;
+    var that = this;
+    var resume = function() {
+        var res = that._parent._exec(that._L, "", options.tag, options.show_traceback);
+        if (res === LUA_YIELD) {
+            post_blocking_task(resume);
+            return;
+        }
+        this.status = 'ready';
+        if (options.callback) {
+            options.callback(res);
+        }
+    };
+    this.status = 'running';
+    var res = this._parent._exec(this._L, txt, options.tag, options.show_traceback);
+    if (res === LUA_YIELD) {
+        post_blocking_task(resume);
+        return;
+    }
+    this.status = 'ready';
+    if (options.callback) {
+        options.callback(res);
+    }
 };
 
 /// Execute a string
@@ -73,7 +105,7 @@ var main = function(options) {
     var emlua_c = EMLUA_C(options);
     this._emlua_c = emlua_c;
     this._init = emlua_c.cwrap('init', 'number', null);
-    this._exec = emlua_c.cwrap('exec', 'boolean', ['number', 'string', 'string', 'number']);
+    this._exec = emlua_c.cwrap('exec', 'number', ['number', 'string', 'string', 'number']);
     this._newthread = emlua_c.cwrap('newthread', 'number', ['number']);
     this._deinit = emlua_c.cwrap('deinit', null, ['number']);
     // Keep pointer to default state
@@ -90,8 +122,8 @@ main.prototype.state = function() {
 };
 
 /// Execute a string
-main.prototype.exec = function(txt, tag, show_traceback) {
-    return this._state.exec(txt, tag, show_traceback);
+main.prototype.exec = function(txt, options) {
+    return this._state.exec(txt, options);
 };
 main.prototype.newthread = function() {
     return this._state.newthread();

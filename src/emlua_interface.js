@@ -15,10 +15,11 @@ var LUA_ERRERR = 6;
 var state = function(parent, otherL) {
     // Check if called without new
     if (!(this instanceof state)) {
-        return new state(parent);
+        return new state(parent, otherL);
     }
     this._parent = parent;
     if (otherL) {
+        console.log('Creating thread with other state ' + otherL);
         this._L = parent._newthread(otherL);
     } else {
         this._L = parent._init();
@@ -41,20 +42,24 @@ state.prototype.exec = function(txt, options) {
     if (!this._L) {
         throw "State has been destroyed with deinit()";
     }
+    var new_state = this.newthread();
     var that = this;
     var resume = function() {
-        var res = that._parent._exec(that._L, "", options.tag, options.show_traceback);
+        var res = new_state._parent._exec(new_state._L, "", options.tag, options.show_traceback);
+        console.log('res(1) = ' + res);
         if (res === LUA_YIELD) {
             post_blocking_task(resume);
             return;
         }
-        this.status = 'ready';
+        that.status = 'ready';
         if (options.callback) {
             options.callback(res);
         }
     };
     this.status = 'running';
-    var res = this._parent._exec(this._L, txt, options.tag, options.show_traceback);
+    console.log('Calling _exec (1)', new_state._parent, new_state._L);
+    var res = new_state._parent._exec(new_state._L, txt, options.tag, options.show_traceback);
+    console.log('res(2) = ' + res);
     if (res === LUA_YIELD) {
         post_blocking_task(resume);
         return;
@@ -70,6 +75,7 @@ state.prototype.newthread = function() {
     if (!this._L) {
         throw "State has been destroyed with deinit()";
     }
+    console.log("Trying to create thread", this._L);
     return state(this._parent, this._L);
 };
 

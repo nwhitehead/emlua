@@ -22,10 +22,6 @@ set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 # External libraries location
 set(EXTERNAL ${PROJECT_SOURCE_DIR}/src/external)
 
-## Selene
-# Headers only
-include_directories(${EXTERNAL}/Selene/include)
-
 ## Lua
 
 set (lua_prefix "${EXTERNAL}/lua-5.3.2/src")

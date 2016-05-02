@@ -1,18 +1,20 @@
 
-#include "selene.h"
+#include "Cheese.hh"
 
 extern "C" {
 
-sel::State *init(void);
+cheese::State *init(void);
 
-int exec(sel::State *L, const char *txt, const char *tag, int show_traceback);
+int loadbuffer(cheese::State *L, const char *txt, const char *tag);
 
-sel::State *newthread(sel::State *L);
+int resume(cheese::State *L, int show_traceback);
 
-void status(sel::State *L);
+cheese::State *newthread(cheese::State *L);
 
-void clear(sel::State *L);
+void status(cheese::State *L);
 
-void deinit(sel::State *L);
+void clear(cheese::State *L);
+
+void deinit(cheese::State *L);
 
 }

@@ -51,17 +51,15 @@ state.prototype.exec = function(txt, options) {
     var new_state = this.newthread();
     var that = this;
     var resume = function() {
-        var res = new_state._parent._exec(new_state._L, "", options.tag, options.show_traceback);
+        var res = new_state._parent._resume(new_state._L, options.show_traceback);
         if (res === LUA_YIELD) {
             post_blocking_task(resume);
             return;
         }
-        that.status = 'ready';
         if (options.callback) {
             options.callback(res);
         }
     };
-    this.status = 'running';
     if (options.timeout) {
 //        var res0 = new_state._parent._exec(new_state._L, timeout_prefix(options.timeout), "@timeout", false);
         // Ignore any results
@@ -70,15 +68,15 @@ state.prototype.exec = function(txt, options) {
 //        var res0 = new_state._parent._exec(new_state._L, debug_prefix, "@debug", false);
         // Ignore any results
     }
-    var res = new_state._parent._exec(new_state._L, txt, options.tag, options.show_traceback);
-    if (res === LUA_YIELD) {
-        post_blocking_task(resume);
-        return;
+    var res = new_state._parent._loadbuffer(new_state._L, txt, options.tag);
+    if (res == LUA_OK) {
+        resume();
+    } else {
+        if (options.callback) {
+            options.callback(res);
+        }
     }
-    this.status = 'ready';
-    if (options.callback) {
-        options.callback(res);
-    }
+    return;
 };
 
 /// Execute a string
@@ -127,7 +125,8 @@ var main = function(options) {
     var emlua_c = EMLUA_C(options);
     this._emlua_c = emlua_c;
     this._init = emlua_c.cwrap('init', 'number', null);
-    this._exec = emlua_c.cwrap('exec', 'number', ['number', 'string', 'string', 'number']);
+    this._loadbuffer = emlua_c.cwrap('loadbuffer', 'number', ['number', 'string', 'string']);
+    this._resume = emlua_c.cwrap('resume', 'number', ['number', 'number']);
     this._newthread = emlua_c.cwrap('newthread', 'number', ['number']);
     this._deinit = emlua_c.cwrap('deinit', null, ['number']);
     this._status = emlua_c.cwrap('status', null, ['number']);
@@ -164,7 +163,8 @@ main.prototype.deinit = function() {
     }
     if (this._emlua_c) {
         this._init = undefined;
-        this._exec = undefined;
+        this._loadbuffer = undefined;
+        this._resume = undefined;
         this._newthread = undefined;
         this._deinit = undefined;
         this._status = undefined;

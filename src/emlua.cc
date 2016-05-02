@@ -1,43 +1,45 @@
 
-#include <cstring>
-#include <iostream>
-#include <string>
-
 #include "emlua.hh"
-#include "selene.h"
+#include "Cheese.hh"
 #include "emscripten.h"
 
 /**
  * Create new fresh state
  */
 EMSCRIPTEN_KEEPALIVE
-sel::State *init(void) {
-    return (new sel::State{true});
+cheese::State *init(void) {
+    return (new cheese::State{true});
 }
 
 /**
- * Execute a string (compile and run)
- * Show any errors to stderr
- * Returns string with general status (not return values)
+ * Push code on stack
  */
 EMSCRIPTEN_KEEPALIVE
-int exec(sel::State *L, const char *txt, const char *tag, int show_traceback) {
-    return L->resume(txt, tag, show_traceback);
+int loadbuffer(cheese::State *L, const char *txt, const char *tag) {
+    return L->loadbuffer(txt, tag);
+}
+
+/**
+ * Run/resume code
+ */
+EMSCRIPTEN_KEEPALIVE
+int resume(cheese::State *L, int show_traceback) {
+    return L->resume(show_traceback);
 }
 
 /**
  * Create new coroutine thread from existing state
  */
 EMSCRIPTEN_KEEPALIVE
-sel::State *newthread(sel::State *L) {
-    return (new sel::State{L, true});
+cheese::State *newthread(cheese::State *L) {
+    return (new cheese::State{L, true});
 }
 
 /**
  * Show status
  */
 EMSCRIPTEN_KEEPALIVE
-void status(sel::State *L) {
+void status(cheese::State *L) {
     L->status();
 }
 
@@ -45,7 +47,7 @@ void status(sel::State *L) {
  * Clear stack (let any subthreads be gc-ed)
  */
 EMSCRIPTEN_KEEPALIVE
-void clear(sel::State *L) {
+void clear(cheese::State *L) {
     L->clear();
 }
 
@@ -53,6 +55,6 @@ void clear(sel::State *L) {
  * Close state and free memory
  */
 EMSCRIPTEN_KEEPALIVE
-void deinit(sel::State *L) {
+void deinit(cheese::State *L) {
     delete L;
 }

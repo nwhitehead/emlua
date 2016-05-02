@@ -32,11 +32,66 @@ var post_blocking_task = function(f) {
     return setTimeout(f);
 };
 
-var timeout_prefix = function(timeout) {
-    return "function timeout(t) local t0 = os.time() return (function() local t1 = os.time() if t1 - t0 > t then error('timed out') end end) end debug.sethook(timeout(" + timeout + "), '', 1000)";
+/// A controller is an interface for already running Lua code
+var controller = function(state, options) {
+    // Check if called without new
+    if (!(this instanceof controller)) {
+        return new controller(state, options);
+    }
+    this.running = true;
+    this.done = false;
+    this.state = state;
+    this.options = options;
+    this.task = null;
+    this.pause_continuation = null;
+    return this;
 };
 
-var debug_prefix = "function f() coroutine.yield() end debug.sethook(f, '', 1000)";
+controller.prototype.resume = function() {
+    var res = this.state._parent._resume(this.state._L, this.options.show_traceback);
+    if (res === LUA_YIELD) {
+        if (this.running) {
+            var that = this;
+            this.task = post_blocking_task(function() { that.resume(); });
+        } else {
+            if (this.pause_continuation) {
+                this.pause_continuation();
+                this.pause_continuation = null;
+            }
+        }
+        return;
+    }
+    // Success or failure callback
+    if (this.options.callback) {
+        this.options.callback(res);
+    }
+    this.done = true;
+};
+
+controller.prototype.unpause = function() {
+    if (!this.done) {
+        this.running = true;
+        var that = this;
+        this.task = post_blocking_task(function() { that.resume(); });
+        // Post event so UI can continue right now
+    }
+};
+
+controller.prototype.pause = function(continuation) {
+    // Run continuation when actually paused
+    if (!this.done) {
+        this.running = false;
+        // Have to wait for main loop post to have effect
+        this.pause_continuation = continuation;
+    }
+};
+
+controller.prototype.cancel = function() {
+    clearTimeout(this.task);
+    this.task = null;
+    this.running = false;
+    this.done = true;
+};
 
 /// Execute a string
 state.prototype.exec = function(txt, options) {
@@ -49,44 +104,18 @@ state.prototype.exec = function(txt, options) {
     }
     var new_state = this.newthread();
     var that = this;
-    var controller = {
-        running: true,
-        resume: function() {
-            var res = new_state._parent._resume(new_state._L, options.show_traceback);
-            if (res === LUA_YIELD) {
-                if (controller.running) {
-                    controller.task = post_blocking_task(controller.resume);
-                }
-                return;
-            }
-            // Success or failure callback
-            if (options.callback) {
-                options.callback(res);
-            }
-        },
-        unpause: function() {
-            controller.running = true;
-            controller.task = post_blocking_task(controller.resume);
-        },
-        pause: function() {
-            controller.running = false;
-        },
-        cancel: function() {
-            console.log('Cancelling task', controller.task);
-            window.clearTimeout(controller.task);
-            controller.task = null;
-        }
-    };
+    var cntrl = new controller(new_state, options);
     var res = new_state._parent._loadbuffer(new_state._L, txt, options.tag);
     if (res == LUA_OK) {
-        controller.resume();
+        cntrl.resume();
     } else {
         // Failure callback
         if (options.callback) {
             options.callback(res);
         }
+        cntrl.done = true;
     }
-    return controller;
+    return cntrl;
 };
 
 /// Execute a string

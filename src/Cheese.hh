@@ -18,6 +18,11 @@ extern "C" {
 
 namespace cheese {
 
+// How many VM instructions to process before yielding control
+// back to the browser main event loop
+// Bigger is better Lua performance but laggier browser user interface
+constexpr int DEBUG_INTERVAL = 5000;
+
 /**
  * Dump stack to stderr
  */
@@ -145,7 +150,7 @@ public:
 
     void debug(bool enable) {
         if (enable) {
-            lua_sethook(_l, &my_yield_hook, LUA_MASKCOUNT, 1000);
+            lua_sethook(_l, &my_yield_hook, LUA_MASKCOUNT, DEBUG_INTERVAL);
         }
     }
 

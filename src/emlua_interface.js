@@ -19,18 +19,17 @@ var state = function(parent, otherL) {
     }
     this._parent = parent;
     if (otherL) {
-//        console.log('Creating thread with other state ' + otherL);
         this._L = parent._newthread(otherL);
     } else {
         this._L = parent._init();
     }
-    this.status = 'ready';
+    this.running = true;
     return this;
 };
 
 /// Post a blocking task to the browser main loop
 var post_blocking_task = function(f) {
-    window.setTimeout(f);
+    return setTimeout(f);
 };
 
 var timeout_prefix = function(timeout) {
@@ -50,33 +49,44 @@ state.prototype.exec = function(txt, options) {
     }
     var new_state = this.newthread();
     var that = this;
-    var resume = function() {
-        var res = new_state._parent._resume(new_state._L, options.show_traceback);
-        if (res === LUA_YIELD) {
-            post_blocking_task(resume);
-            return;
-        }
-        if (options.callback) {
-            options.callback(res);
+    var controller = {
+        running: true,
+        resume: function() {
+            var res = new_state._parent._resume(new_state._L, options.show_traceback);
+            if (res === LUA_YIELD) {
+                if (controller.running) {
+                    controller.task = post_blocking_task(controller.resume);
+                }
+                return;
+            }
+            // Success or failure callback
+            if (options.callback) {
+                options.callback(res);
+            }
+        },
+        unpause: function() {
+            controller.running = true;
+            controller.task = post_blocking_task(controller.resume);
+        },
+        pause: function() {
+            controller.running = false;
+        },
+        cancel: function() {
+            console.log('Cancelling task', controller.task);
+            window.clearTimeout(controller.task);
+            controller.task = null;
         }
     };
-    if (options.timeout) {
-//        var res0 = new_state._parent._exec(new_state._L, timeout_prefix(options.timeout), "@timeout", false);
-        // Ignore any results
-    }
-    if (options.debug) {
-//        var res0 = new_state._parent._exec(new_state._L, debug_prefix, "@debug", false);
-        // Ignore any results
-    }
     var res = new_state._parent._loadbuffer(new_state._L, txt, options.tag);
     if (res == LUA_OK) {
-        resume();
+        controller.resume();
     } else {
+        // Failure callback
         if (options.callback) {
             options.callback(res);
         }
     }
-    return;
+    return controller;
 };
 
 /// Execute a string
@@ -84,7 +94,6 @@ state.prototype.newthread = function() {
     if (!this._L) {
         throw "State has been destroyed with deinit()";
     }
-//    console.log("Trying to create thread", this._L);
     return state(this._parent, this._L);
 };
 

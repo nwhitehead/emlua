@@ -33,7 +33,7 @@ static void stackdump_g(lua_State* l)
         int t = lua_type(l, i);
         switch (t) {
             case LUA_TSTRING:  /* strings */
-                std::cerr << "string: '" << lua_tostring(l, i);
+                std::cerr << "string: [" << lua_tostring(l, i) << "]";
                 break;
             case LUA_TBOOLEAN:  /* booleans */
                 std::cerr << "boolean: " << lua_toboolean(l, i);
@@ -75,12 +75,25 @@ static void my_yield_hook(lua_State *L, lua_Debug *ar) {
 }
 
 /**
- * Handle an exception
- * Print top of stack value to stderr
+ * Extended functionality way to convert value to string
  */
-static void handle_exception(int status, lua_State *L) {
-    const char *msg = lua_tostring(L, -1);
-    std::cerr << msg << std::endl;
+static std::string luavalue_tostring(lua_State *L, int index) {
+    if (!lua_isstring(L, index)) {
+        if (lua_isnoneornil(L, index)) {
+            return std::string{""};
+        } else {
+            return std::string{"(error object is not a string)"};
+        }
+    }
+    return std::string{lua_tostring(L, index)};
+}
+
+/**
+ * Handle an exception
+ */
+static void handle_exception(int _status, lua_State *L) {
+    // Default behavior is to print value on top of stack to stderr
+    std::cerr << luavalue_tostring(L, -1) << std::endl;
 }
 
 class State {
@@ -181,7 +194,8 @@ public:
             return status;
         }
         if (show_traceback) {
-            // We can do traceback now, stack is not disturbed by returning from dead coroutine
+            // We can do traceback now
+            // Stack is not disturbed by returning from dead coroutine
             traceback(_l);
         }
         handle_exception(status, _l);

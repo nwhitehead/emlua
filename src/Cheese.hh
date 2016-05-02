@@ -70,13 +70,27 @@ static int traceback(lua_State *L) {
     return 1;
 }
 
+static void count_hook(lua_State *L, lua_Debug *ar);
+static void line_hook(lua_State *L, lua_Debug *ar);
+
 /**
  * A simple C hook function that yields
  * Needed because Lua hooks cannot yield (hooks are special)
  * C hooks can yield if they are line or count hooks and have 0 arguments.
  */
-static void my_yield_hook(lua_State *L, lua_Debug *ar) {
+static void line_hook(lua_State *L, lua_Debug *ar) {
+    // Turn off line hook, turn on count hook
+    lua_sethook(L, &count_hook, LUA_MASKCOUNT, DEBUG_INTERVAL);
     lua_yield(L, 0);
+}
+
+/**
+ * Initial hook triggered on count VM instructions
+ * Might be in the middle of a line of code, wait until line is done
+ */
+static void count_hook(lua_State *L, lua_Debug *ar) {
+    // Turn off counting hook, turn on line hook
+    lua_sethook(L, &line_hook, LUA_MASKLINE, 0);
 }
 
 /**
@@ -150,7 +164,7 @@ public:
 
     void debug(bool enable) {
         if (enable) {
-            lua_sethook(_l, &my_yield_hook, LUA_MASKCOUNT, DEBUG_INTERVAL);
+            lua_sethook(_l, &count_hook, LUA_MASKCOUNT, DEBUG_INTERVAL);
         }
     }
 

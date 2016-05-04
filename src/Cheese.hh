@@ -56,20 +56,28 @@ static void stackdump_g(lua_State* l)
 }
 
 /**
+ * Extended functionality way to convert value to string
+ */
+static std::string luavalue_tostring(lua_State *L, int index) {
+    if (!lua_isstring(L, index)) {
+        if (lua_isnoneornil(L, index)) {
+            return std::string{""};
+        } else {
+            return std::string{"(error object is not a string)"};
+        }
+    }
+    return std::string{lua_tostring(L, index)};
+}
+
+/**
  * Get traceback, put on top of stack
  */
 static int traceback(lua_State *L) {
-    if (!lua_isstring(L, 1)) {
-        if (lua_isnoneornil(L, 1) ||
-            !luaL_callmeta(L, 1, "__tostring") ||
-            !lua_isstring(L, -1))
-            return 1;
-        lua_remove(L, 1);
-    }
-    luaL_traceback(L, L, lua_tostring(L, 1), 1);
+    luaL_traceback(L, L, luavalue_tostring(L, 1).c_str(), 1);
     return 1;
 }
 
+// Forward declarations
 static void count_hook(lua_State *L, lua_Debug *ar);
 static void line_hook(lua_State *L, lua_Debug *ar);
 
@@ -94,20 +102,6 @@ static void count_hook(lua_State *L, lua_Debug *ar) {
 }
 
 /**
- * Extended functionality way to convert value to string
- */
-static std::string luavalue_tostring(lua_State *L, int index) {
-    if (!lua_isstring(L, index)) {
-        if (lua_isnoneornil(L, index)) {
-            return std::string{""};
-        } else {
-            return std::string{"(error object is not a string)"};
-        }
-    }
-    return std::string{lua_tostring(L, index)};
-}
-
-/**
  * Handle an exception
  */
 static void handle_exception(int _status, lua_State *L) {
@@ -116,12 +110,14 @@ static void handle_exception(int _status, lua_State *L) {
 }
 
 class State {
+
 private:
     lua_State *_l;
     bool _l_owner;
 
 public:
     State() : State(false) {}
+
     State(bool should_open_libs) : _l(nullptr), _l_owner(true) {
         _l = luaL_newstate();
         if (_l == nullptr) {
@@ -131,12 +127,17 @@ public:
             luaL_openlibs(_l);
         }
     }
+
     State(lua_State *l) : _l(l), _l_owner(false) { }
+
     State(const State &other) = delete;
+
     State &operator=(const State &other) = delete;
+
     State(State &&other) : _l(other._l), _l_owner(other._l_owner) {
         other._l = nullptr;
     }
+
     State &operator=(State &&other) {
         if (&other == this) return *this;
         _l = other._l;
@@ -144,6 +145,7 @@ public:
         other._l = nullptr;
         return *this;
     }
+
     State(const State *other, bool should_open_libs) : _l(nullptr), _l_owner(true) {
         _l = lua_newthread(other->_l);
         if (_l == nullptr) {
@@ -154,6 +156,7 @@ public:
         }
         debug(true);
     }
+
     ~State() {
         if (_l != nullptr && _l_owner) {
             gc();
@@ -162,13 +165,18 @@ public:
         _l = nullptr;
     }
 
+/// Methods
+
+    /**
+     * Enable/disable debugging hooks
+     */
     void debug(bool enable) {
         if (enable) {
             lua_sethook(_l, &count_hook, LUA_MASKCOUNT, DEBUG_INTERVAL);
+        } else {
+            lua_sethook(_l, nullptr, 0, DEBUG_INTERVAL);
         }
     }
-
-public:
 
     /**
      * Show stack dump to stderr

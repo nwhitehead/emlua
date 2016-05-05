@@ -10,6 +10,7 @@ var LUA_ERRSYNTAX = 3;
 var LUA_ERRMEM = 4;
 var LUA_ERRGCMM = 5;
 var LUA_ERRERR = 6;
+var GLOBAL_DEBUG_VAR = '_brk';
 
 /// State class, constructed from existing C state
 var state = function(parent, otherL) {
@@ -47,12 +48,20 @@ var controller = function(state, options) {
     return this;
 };
 
-controller.prototype.resume = function() {
+controller.prototype.resume = function(pause_continuation) {
+    this.state._parent._setglobal_bool(this.state._L, GLOBAL_DEBUG_VAR, 0);
     var res = this.state._parent._resume(this.state._L, this.options.show_traceback);
     if (res === LUA_YIELD) {
         if (this.running) {
-            var that = this;
-            this.task = post_blocking_task(function() { that.resume(); });
+            // Check for global variable that indicates we should break for debugging
+            var isbreak = this.state._parent._getglobal_bool(this.state._L, GLOBAL_DEBUG_VAR);
+            if (isbreak) {
+                this.state._parent._setglobal_bool(this.state._L, GLOBAL_DEBUG_VAR, 0);
+                this.pause(pause_continuation);
+            } else {
+                var that = this;
+                this.task = post_blocking_task(function() { that.resume(); });
+            }
         } else {
             if (this.pause_continuation) {
                 this.pause_continuation();
@@ -168,6 +177,8 @@ var main = function(options) {
     this._newthread = emlua_c.cwrap('newthread', 'number', ['number']);
     this._deinit = emlua_c.cwrap('deinit', null, ['number']);
     this._status = emlua_c.cwrap('status', null, ['number']);
+    this._getglobal_bool = emlua_c.cwrap('getglobal_bool', 'number', ['number', 'string']);
+    this._setglobal_bool = emlua_c.cwrap('setglobal_bool', null, ['number', 'string', 'number']);
     this._clear = emlua_c.cwrap('clear', null, ['number']);
     // Keep pointer to default state
     this._state = state(this);
@@ -207,6 +218,8 @@ main.prototype.deinit = function() {
         this._deinit = undefined;
         this._status = undefined;
         this._clear = undefined;
+        this._getglobal_bool = undefined;
+        this._setglobal_bool = undefined;
         this._emlua_c = undefined;
     } else {
         throw "Main state has been destroyed with deinit()";

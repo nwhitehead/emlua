@@ -52,6 +52,24 @@ void clear(cheese::State *L) {
 }
 
 /**
+ * Get global boolean value
+ */
+EMSCRIPTEN_KEEPALIVE
+int getglobal_bool(cheese::State *L, const char *name)
+{
+    return L->getglobal_bool(name);
+}
+
+/**
+ * Set global boolean value
+ */
+EMSCRIPTEN_KEEPALIVE
+void setglobal_bool(cheese::State *L, const char *name, int value)
+{
+    L->setglobal_bool(name, value);
+}
+
+/**
  * Close state and free memory
  */
 EMSCRIPTEN_KEEPALIVE

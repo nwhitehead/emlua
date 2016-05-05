@@ -228,6 +228,24 @@ public:
         handle_exception(status, _l);
         return status;
     }
+    
+    /**
+     * Get global boolean
+     */
+    int getglobal_bool(const char *name) {
+        lua_getglobal(_l, name);
+        int res = lua_toboolean(_l, -1);
+        lua_remove(_l, -1);
+        return res;
+    }
+
+    /**
+     * Set global boolean
+     */
+    void setglobal_bool(const char *name, int value) {
+        lua_pushboolean(_l, value);
+        lua_setglobal(_l, name);
+    }
 };
 
 } /// namespace

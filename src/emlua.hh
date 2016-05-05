@@ -15,6 +15,9 @@ void status(cheese::State *L);
 
 void clear(cheese::State *L);
 
+int getglobal_bool(cheese::State *L, const char *name);
+void setglobal_bool(cheese::State *L, const char *name, int value);
+
 void deinit(cheese::State *L);
 
 }

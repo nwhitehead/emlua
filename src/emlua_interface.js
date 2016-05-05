@@ -48,7 +48,7 @@ var controller = function(state, options) {
     return this;
 };
 
-controller.prototype.resume = function(pause_continuation) {
+controller.prototype.resume = function() {
     this.state._parent._setglobal_bool(this.state._L, GLOBAL_DEBUG_VAR, 0);
     var res = this.state._parent._resume(this.state._L, this.options.show_traceback);
     if (res === LUA_YIELD) {
@@ -57,7 +57,11 @@ controller.prototype.resume = function(pause_continuation) {
             var isbreak = this.state._parent._getglobal_bool(this.state._L, GLOBAL_DEBUG_VAR);
             if (isbreak) {
                 this.state._parent._setglobal_bool(this.state._L, GLOBAL_DEBUG_VAR, 0);
-                this.pause(pause_continuation);
+                this.pause();
+                if (this.pause_continuation) {
+                    this.pause_continuation();
+                    this.pause_continuation = null;
+                }
             } else {
                 var that = this;
                 this.task = post_blocking_task(function() { that.resume(); });
@@ -86,12 +90,12 @@ controller.prototype.unpause = function() {
     }
 };
 
-controller.prototype.pause = function(continuation) {
+controller.prototype.pause = function() {
     // Run continuation when actually paused
     if (!this.done) {
         this.running = false;
         // Have to wait for main loop post to have effect
-        this.pause_continuation = continuation;
+        this.pause_continuation = this.options.pause_continuation;
     }
 };
 

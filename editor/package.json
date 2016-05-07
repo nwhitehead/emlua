@@ -1,0 +1,36 @@
+{
+  "name": "emlua-editor",
+  "version": "1.0.0",
+  "description": "Editor to play around with Lua code and run it.",
+  "main": "src/main.js",
+  "dependencies": {
+    "jquery": "^2.2.3",
+    "jquery.terminal": "^0.9.3",
+    "moment": "~2.13.0",
+    "js-cookie": "~2.1.1",
+    "firebase": "~2.4.2"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "browserify-css": "^0.9.1",
+    "browserify-shim": "^3.8.12"
+  },
+  "browser": {
+    "main": "./src/main.js",
+    "ace": "./src/vendor/ace/ace-src-min-noconflict.js",
+    "ace-theme": "./src/vendor/ace/theme-twilight.js",
+    "ace-mode": "./src/vendor/ace/mode-lua.js"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-css"
+    ]
+  },
+  "scripts": {
+    "build-js": "browserify . > ./build/dist.js",
+    "watch-js": "watchify . -o ./build/dist.js",
+    "server": "python -m SimpleHTTPServer"
+  },
+  "author": "Nathan Whitehead",
+  "license": "ISC"
+}

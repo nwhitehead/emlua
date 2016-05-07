@@ -1,2 +1,5 @@
-build
+build/*
+!build/empty
+editor/build/*
+!editor/build/empty
 node_modules

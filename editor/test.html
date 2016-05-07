@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EmLua Editor Test</title>
+
+<style>
+body {
+    background: #141414;
+    color: #aaa;
+}
+</style>
+</head>
+<body>
+
+<div class="workspace">
+    <div class="header">
+        <div class="padding">
+            <a href="#" class="button" id="run">Run</a>
+            <a href="#" class="button button-primary" id="save">Save</a>
+            <a href="#" class="button" id="pause">Pause</a>
+            <a href="#" class="button" id="clear">Clear</a>
+        </div>
+    </div>
+    <div class="left-pane">
+        <div id="editor" class="editor"></div>
+    </div>
+    <div id="resizer" class="resizer"></div>
+    <div class="right-pane">
+        <div class="top-right-area">
+            <canvas id="output" class="output" width=320 height=240></canvas>
+        </div>
+        <div class="bottom-right-area">
+            <div id="terminal-container" class="terminal-container">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <div class="padding">
+    </div>
+</div>
+
+<script src="src/vendor/emlua/emlua.js"></script>
+<script src="./build/dist.js"></script>
+
+</body>
+</html>

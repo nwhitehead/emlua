@@ -25,16 +25,14 @@ Some advantages:
 
 ## Build
 
+Requires [CMake](https://cmake.org/) 3.1 or later.
+
 Requires [Emscripten](http://kripken.github.io/emscripten-site/). Set
 up your environment variables by doing something like `source emsdk/emsdk_env.sh`.
 Once you can run `emcc --version` successfully do the following:
 
 ```
-git submodule update --init --recursive
-mkdir build
-cd build
-cmake ..
-make -j
+npm run-script build
 ```
 
 The output file is `build/emlua.js`. The build embeds all the Lua

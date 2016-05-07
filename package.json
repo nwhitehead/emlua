@@ -6,7 +6,8 @@
   "dependencies": {},
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "cd build && cmake .. && make -j && cp emlua.js ../editor/src/vendor/emlua/",
+    "watch-build": "cd build && cmake .. && watch 'make -j && cp emlua.js ../editor/src/vendor/emlua/'"
   },
   "author": "Nathan Whitehead",
   "license": "ISC"

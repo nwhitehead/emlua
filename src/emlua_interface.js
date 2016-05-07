@@ -106,7 +106,7 @@ controller.prototype.cancel = function() {
     this.done = true;
 };
 
-/// Execute a string
+/// Execute a string asynchronously
 state.prototype.exec = function(txt, options) {
     // Tag chunk with string if not given explicitly
     options = options || {};
